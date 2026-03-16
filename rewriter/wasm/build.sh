@@ -23,7 +23,6 @@ fi
 
 which cargo wasm-bindgen wasm-opt wasm-snip &> /dev/null || {
 	echo "Please install cargo, wasm-bindgen, wasm-opt from https://github.com/WebAssembly/binaryen, and wasm-snip from https://github.com/r58playz/wasm-snip!"
-	exit 1
 }
 
 WBG="wasm-bindgen 0.2.100"

@@ -5,7 +5,7 @@ wget https://github.com/WebAssembly/binaryen/releases/download/version_128/binar
 tar -xvzf binaryen-version_128-x86_64-linux.tar.gz
 export PATH="$PWD/binaryen-version_128/bin:$PATH"
 cargo install wasm-snip
-cargo install wasm-bindgen-cli @0.2.100
+cargo install wasm-bindgen-cli --version 0.2.100
 wasm-opt --version
 wasm-snip --version
 wasm-bindgen --version

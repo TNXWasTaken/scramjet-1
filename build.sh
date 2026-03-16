@@ -2,8 +2,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 . "$HOME/.cargo/env"
 pnpm i
 cargo install wasm-bindgen-cli
-sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install binaryen
+cargo add binaryen
 cargo install wasm-snip
 pnpm rewriter:build
 pnpm build

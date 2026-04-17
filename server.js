@@ -82,6 +82,22 @@ fastify.register(fastifyStatic, {
 	prefix: "/baremod/",
 	decorateReply: false,
 });
+fastify.register(fastifyStatic, {
+	root: join(
+		fileURLToPath(new URL(".", import.meta.url)),
+		"./node_modules/@mercuryworkshop/adrift/dist"
+	),
+	prefix: "/adrift/",
+	decorateReply: false,
+});
+fastify.register(fastifyStatic, {
+	root: join(
+		fileURLToPath(new URL(".", import.meta.url)),
+		"./node_modules/@mercuryworkshop/bare-client-custom/dist"
+	),
+	prefix: "/bare-client-custom/",
+	decorateReply: false,
+});
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) || 1337 : 1337;
 

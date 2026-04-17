@@ -1,6 +1,13 @@
 <!doctype html>
 <html lang="en">
 	<head>
+		<script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
+		<script>
+			console.log("before vconsole active");
+			var vConsole = new window.VConsole();
+			console.log("vConsole is active");
+		</script>
+
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Scramjet</title>
@@ -48,6 +55,17 @@
 				}
 			}
 		</style>
+		<script type="importmap">
+			{
+				"imports": {
+					"@mercuryworkshop/bare-client-custom": "/bare-client-custom/index.js",
+					"firebase/app": "https://esm.sh/firebase/app",
+					"firebase/database": "https://esm.sh/firebase/database",
+					"firebase/auth": "https://esm.sh/firebase/auth",
+					"uuid": "https://esm.sh/uuid"
+				}
+			}
+		</script>
 		<script
 			defer
 			data-domain="scramjet.mercurywork.shop"

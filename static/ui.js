@@ -1,3 +1,5 @@
+import { initializeApp } from "firebase/app";
+
 const { ScramjetController } = $scramjetLoadController();
 
 const scramjet = new ScramjetController({
@@ -26,6 +28,89 @@ const col = css`
 `;
 
 connection.setTransport(store.transport, [{ wisp: store.wispurl }]);
+
+class AdriftAdapter {
+	constructor(adriftClient) {
+		this.client = adriftClient;
+		this.ready = false;
+	}
+	async init() {
+		await this.client.initialize();
+		this.ready = true;
+	}
+	async request(url, method, body, headers, signal) {
+		return this.client.request(
+			method,
+			headers,
+			body,
+			url,
+			null,
+			null,
+			signal,
+			ArrayBuffer
+		);
+	}
+	connect(url, protocols, headers, onOpen, onMessage, onClose, onError) {
+		return this.client.connect(
+			url,
+			protocols,
+			() => headers,
+			null,
+			null,
+			null,
+			ArrayBuffer
+		);
+	}
+}
+
+async function connectAdrift() {
+	console.log("connectAdrift called");
+	const [
+		{ SignalFirebase, AdriftBareClient, RTCTransport },
+		{ default: TrackerList },
+	] = await Promise.all([
+		import("/adrift/client.mjs"),
+		import("/adrift/tracker-list.mjs"),
+	]);
+	const tracker = TrackerList["us-central-1"];
+	try {
+		initializeApp(tracker.firebase);
+	} catch (e) {
+		console.log("error: " + e);
+	}
+	console.log("tracker");
+
+	return new Promise((resolve, reject) => {
+		console.log("promise started");
+		const rtcTransport = new RTCTransport(
+			async (transport) => {
+				try {
+					console.log("in promise");
+					console.log("transport opened", transport);
+					const conn = new Connection(transport);
+					await conn.initialize();
+					const bare = new AdriftBareClient(conn);
+					resolve(new AdriftAdapter(bare));
+				} catch (e) {
+					console.log("error: " + e);
+				}
+			},
+			() => {
+				console.log("transport closed");
+				reject(new Error("Adrift transport closed"));
+			}
+		);
+
+		rtcTransport
+			.createOffer()
+			.then((offer) => SignalFirebase.signalSwarm(JSON.stringify(offer)))
+			.then((answer) => rtcTransport.answer(answer.answer, answer.candidates))
+			.catch((e) => {
+				console.log("signaling failed: " + e);
+				reject(e);
+			});
+	});
+}
 
 function Config() {
 	this.css = `
@@ -97,6 +182,15 @@ function Config() {
 								]);
 								store.transport = "/epoxy/index.mjs";
 							}}>use epoxy</button>
+                <button on:click=${async () => {
+									try {
+										const adapted = await connectAdrift();
+										await connection.setRemoteTransport(adapted);
+										store.transport = "adrift";
+									} catch (e) {
+										console.log("Adrift connection failed: " + e);
+									}
+								}}>use adrift</button>
           </div>
         </div>
         <div class=${[flex, col, "input_row"]}>
